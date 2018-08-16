@@ -1,23 +1,27 @@
 #include <ps2.h>
 
-#define P_DATA  2
-#define P_CLOCK 3
+const P_DATA = 2;
+const P_CLOCK = 3;
 
 // pins 8-12
-#define S_DATA  8
-#define S_LATCH 9
-#define S_CLOCK 10
+const S_DATA = 8;
+const S_LATCH = 9;
+const S_CLOCK = 10;
 
 #define REVERSE_BUTTONS
 #define LED
 
+const checkLatch = (PINB&(1<<(S_LATCH-8)));
+const checkClock = (PINB&(1<<(S_CLOCK-8)));
 
+function void writeData(byte x){
+  if(x)
+    PORTB|=(1<<(S_DATA-8));
+  else
+    PORTB&=~(1<<(S_DATA-8));
+}
 
-#define checkLatch (PINB&(1<<(S_LATCH-8)))
-#define checkClock (PINB&(1<<(S_CLOCK-8)))
-inline void writeData(byte x){ if(x) PORTB|=(1<<(S_DATA-8)); else PORTB&=~(1<<(S_DATA-8)); }
-
-inline byte reverse(byte b) { // thanks "sth" from StackOverflow
+function byte reverse(byte b) { // thanks "sth" from StackOverflow
    b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
    b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
    b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
@@ -34,6 +38,7 @@ byte led;
 #endif
 
 PS2 mouse(P_CLOCK, P_DATA);
+
 void mouse_init()
 {
   mouse.write(0xff);  // reset
@@ -63,6 +68,7 @@ void mouse_init()
   
   delayMicroseconds(100);
 }
+
 void mouse_update()
 {
   mouse.write(0xeb);
