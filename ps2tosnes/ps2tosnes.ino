@@ -1,27 +1,22 @@
-#include <ps2.h>
+#include <PS2Mouse.h>
 
-const P_DATA = 2;
-const P_CLOCK = 3;
+#define P_DATA  2
+#define P_CLOCK 3
 
 // pins 8-12
-const S_DATA = 8;
-const S_LATCH = 9;
-const S_CLOCK = 10;
+#define S_DATA  8
+#define S_LATCH 9
+#define S_CLOCK 10
 
-#define REVERSE_BUTTONS
+//#define REVERSE_BUTTONS
 #define LED
 
-const checkLatch = (PINB&(1<<(S_LATCH-8)));
-const checkClock = (PINB&(1<<(S_CLOCK-8)));
 
-function void writeData(byte x){
-  if(x)
-    PORTB|=(1<<(S_DATA-8));
-  else
-    PORTB&=~(1<<(S_DATA-8));
-}
+#define checkLatch (PINB&(1<<(S_LATCH-8)))
+#define checkClock (PINB&(1<<(S_CLOCK-8)))
+inline void writeData(byte x){ if(x) PORTB|=(1<<(S_DATA-8)); else PORTB&=~(1<<(S_DATA-8)); }
 
-function byte reverse(byte b) { // thanks "sth" from StackOverflow
+inline byte reverse(byte b) { // thanks "sth" from StackOverflow
    b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
    b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
    b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
@@ -37,14 +32,10 @@ signed char x,y;
 byte led;
 #endif
 
-PS2 mouse(P_CLOCK, P_DATA);
-
+PS2Mouse mouse(P_CLOCK, P_DATA, STREAM);
 void mouse_init()
 {
-  mouse.write(0xff);  // reset
-  mouse.read();
-  mouse.read();
-  mouse.read();
+  mouse.initialize();
   /* // wheel mouse mode
   
   mouse.write(0xf3);  // sample rate
@@ -68,17 +59,17 @@ void mouse_init()
   
   delayMicroseconds(100);
 }
-
 void mouse_update()
 {
-  mouse.write(0xeb);
-  mouse.read();
-  mdata[0] = mouse.read();
-  mdata[1] = mouse.read();
-  mdata[2] = mouse.read();
+  int data[2];
+  mouse.report(data);
+  mdata[0]=data[0];
+  mdata[1]=data[1];
+  mdata[2]=data[2];
 }
 
 void setup() {
+//  Serial.begin(9600);
   mouse_init();
   pinMode(S_DATA,OUTPUT);
   pinMode(S_LATCH,INPUT_PULLUP);
@@ -97,6 +88,8 @@ void setup() {
 
 void loop() {
   mouse_update();
+
+//  Serial.println(mdata[0],BIN);
   
   x=(signed char)mdata[1];
   y=(signed char)mdata[2];
