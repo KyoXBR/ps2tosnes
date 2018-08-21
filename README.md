@@ -4,4 +4,4 @@ Arduino sketch that lets you use a PS/2 mouse as a replacement SNES mouse.
 Useful if your mouse breaks or if you don't own a mouse, but you own a game that can use a mouse.
 You could modify it to make a controller version using another type of gamepad, or a TAS playback device.
 
-It requires the "PS2" arduino library: http://playground.arduino.cc/uploads/ComponentLib/ps2.zip
+It requires kristopher's PS2 Mouse arduino library: https://github.com/kristopher/PS2-Mouse-Arduino
